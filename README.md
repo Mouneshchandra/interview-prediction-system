@@ -1,6 +1,6 @@
-# Interview Review Prototype
+# Interview Prediction System
 
-A local Flask prototype that extracts facial-action and head-pose signals from selected video frames and presents an experimental review brief. It does not transcribe speech, evaluate interview answers, or assess job skills.
+A local Flask application for candidate intake, interview video analysis, and a structured recruiter review brief. It extracts experimental facial-action and head-pose signals from selected video frames; it does not transcribe speech, evaluate interview answers, or assess job skills.
 
 ## Important limitations
 
