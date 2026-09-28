@@ -1,0 +1,25 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+
+# Candidate footage and generated analysis artifacts
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+static/uploads/
+static/results/
+temp_frames/
+segment_results/
+of_au.csv
+ocean_hire_output_rt.csv
+
+# Local tooling and logs
+.vscode/
+.pytest_cache/
+*.log

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recruiter review | Interview Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink: #1d2b26; --muted: #68756e; --line: #dce4de; --paper: #f5f7f3; --white: #fff; --forest: #17624c; --lime: #d4f36b; --coral: #db765f; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.55 'DM Sans', sans-serif; }
+    .shell { max-width: 1160px; margin: auto; padding: 0 30px; }
+    header { height: 72px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 10px; font: 800 13px 'Manrope', sans-serif; letter-spacing: .03em; }
+    .brand-mark { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 5px; background: var(--forest); color: var(--lime); }
+    .header-actions { display: flex; align-items: center; gap: 17px; }
+    .status-chip { padding: 6px 10px; border-radius: 4px; background: #e8eee7; color: var(--forest); font-size: 11px; font-weight: 700; }
+    a { color: var(--forest); }
+    .restart { font-size: 12px; font-weight: 700; text-decoration: none; }
+    .eyebrow { color: var(--forest); font-size: 11px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: 5px 0 0; font: 700 29px 'Manrope', sans-serif; letter-spacing: 0; }
+    .heading { display: flex; justify-content: space-between; align-items: end; padding: 34px 0 22px; }
+    .subhead { margin: 5px 0 0; color: var(--muted); }
+    .candidate-strip { display: grid; grid-template-columns: 1.2fr 1fr .9fr .8fr; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--white); }
+    .candidate-item { min-width: 0; padding: 15px 18px; border-right: 1px solid var(--line); }
+    .candidate-item:last-child { border-right: 0; }
+    .candidate-label { display: block; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .candidate-value { display: block; overflow-wrap: anywhere; margin-top: 4px; font: 700 14px 'Manrope', sans-serif; }
+    .overview { display: grid; grid-template-columns: minmax(250px, .75fr) minmax(0, 1.25fr); gap: 24px; margin-top: 24px; }
+    .score-panel { min-height: 203px; padding: 22px; border-radius: 6px; background: var(--forest); color: white; }
+    .score-label { color: #d9e7dc; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .score-line { display: flex; align-items: baseline; gap: 9px; margin-top: 12px; }
+    .score-number { font: 800 51px/.95 'Manrope', sans-serif; letter-spacing: 0; }
+    .score-outof { color: #d9e7dc; font-size: 14px; }
+    .score-track { height: 8px; margin-top: 18px; overflow: hidden; border-radius: 4px; background: #ffffff38; }
+    .score-fill { width: {{ score_percent if score_percent is not none else 0 }}%; height: 100%; border-radius: inherit; background: var(--lime); }
+    .score-caption { margin: 10px 0 0; color: #d9e7dc; font-size: 11px; }
+    .readout { padding: 20px 22px; border-left: 3px solid var(--coral); background: #fff; }
+    .readout h2, .section-title { margin: 0; font: 700 16px 'Manrope', sans-serif; }
+    .readout p { margin: 8px 0 0; color: #526058; }
+    .review-tag { display: inline-block; margin-top: 12px; padding: 5px 8px; background: #f2eee8; color: #5e5447; font-size: 11px; font-weight: 700; }
+    .learning-brief { margin-top: 25px; padding: 22px 23px; border-top: 4px solid var(--lime); background: white; }
+    .learning-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 15px; }
+    .learning-head h2 { margin: 0; font: 700 19px 'Manrope', sans-serif; }
+    .learning-head span { color: var(--muted); font-size: 11px; }
+    .signal-note { margin: 0 0 17px; padding: 12px 14px; border-left: 2px solid var(--forest); background: #eef3ee; color: #35433b; }
+    .learning-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .learning-column h3 { margin: 0 0 9px; font: 700 13px 'Manrope', sans-serif; }
+    .learning-column ul, .learning-column ol { margin: 0; padding-left: 20px; color: #526058; }
+    .learning-column li { padding: 4px 0; }
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 30px; padding: 30px 0; }
+    .section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 11px; }
+    .section-note { color: var(--muted); font-size: 11px; }
+    .trait-table { width: 100%; border-collapse: collapse; background: white; }
+    .trait-table th { padding: 10px 12px; border-bottom: 1px solid var(--line); color: var(--muted); text-align: left; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
+    .trait-table td { padding: 12px; border-bottom: 1px solid #e9eee9; }
+    .trait-table tr:last-child td { border-bottom: 0; }
+    .trait-name { width: 36%; font-weight: 700; }
+    .trait-value { width: 54px; text-align: right; font-variant-numeric: tabular-nums; }
+    .trait-meter { height: 7px; overflow: hidden; border-radius: 4px; background: #e6ece7; }
+    .trait-meter span { display: block; height: 100%; border-radius: inherit; background: var(--forest); }
+    .scale-caption { display: flex; justify-content: space-between; margin: 5px 0 0; color: #89958e; font-size: 10px; }
+    .segment-table { width: 100%; border-collapse: collapse; margin-top: 21px; }
+    .segment-table th, .segment-table td { padding: 9px 8px; border-bottom: 1px solid var(--line); text-align: left; font-size: 12px; }
+    .segment-table th { color: var(--muted); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+    .feedback { margin-top: 0; padding: 17px 18px; border-top: 3px solid var(--lime); background: white; white-space: pre-line; color: #35433b; font-size: 13px; }
+    .followup { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .followup p { margin: 8px 0 0; color: #536158; }
+    .frame-section { padding: 23px 0 35px; border-top: 1px solid var(--line); }
+    .frame-layout { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr); gap: 25px; align-items: start; }
+    .annotated { display: block; width: 100%; max-width: 440px; max-height: 330px; object-fit: contain; background: #1d2b26; border-radius: 5px; }
+    .no-frame { padding: 30px; background: white; color: var(--muted); }
+    .limitation { padding: 17px 18px; border-left: 3px solid var(--coral); background: #f0ebe5; color: #584f45; font-size: 12px; }
+    footer { padding: 15px 0 23px; border-top: 1px solid var(--line); color: #77837c; font-size: 11px; }
+    @media (max-width: 760px) {
+      .shell { padding: 0 17px; }
+      .heading { align-items: start; flex-direction: column; gap: 12px; }
+      .candidate-strip { grid-template-columns: 1fr 1fr; }
+      .candidate-item:nth-child(2) { border-right: 0; }
+      .candidate-item:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .overview, .content-grid, .frame-layout, .learning-grid { grid-template-columns: 1fr; }
+      .content-grid { gap: 29px; }
+      .status-chip { display: none; }
+    }
+    @media (max-width: 440px) { .trait-name { width: 43%; } .candidate-item { padding: 12px; } h1 { font-size: 25px; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><span class="brand-mark">IR</span><span>INTERVIEW REVIEW</span></div>
+      <div class="header-actions"><span class="status-chip">SUPPLEMENTARY SIGNALS ONLY</span><a class="restart" href="{{ url_for('reset_session') }}">New candidate →</a></div>
+    </header>
+    <main>
+      <div class="heading">
+        <div><div class="eyebrow">Recruiter review / 03</div><h1>Interview signal brief</h1><p class="subhead">A structured view of the recorded session for human review.</p></div>
+        <span class="section-note">Video-only experimental estimates</span>
+      </div>
+      <section class="candidate-strip" aria-label="Candidate details">
+        <div class="candidate-item"><span class="candidate-label">Candidate</span><span class="candidate-value">{{ candidate.get('name', 'Not provided') }}</span></div>
+        <div class="candidate-item"><span class="candidate-label">Role</span><span class="candidate-value">{{ candidate.get('role', 'Not provided') }}</span></div>
+        <div class="candidate-item"><span class="candidate-label">Email</span><span class="candidate-value">{{ candidate.get('email') or 'Not provided' }}</span></div>
+        <div class="candidate-item"><span class="candidate-label">Experience</span><span class="candidate-value">{% if candidate.get('experience') is not none %}{{ candidate.get('experience') }} years{% else %}Not provided{% endif %}</span></div>
+      </section>
+      <section class="overview" aria-label="Score overview">
+        <div class="score-panel">
+          <div class="score-label">Video signal score</div>
+          <div class="score-line"><span class="score-number">{% if final_avg_score is not none %}{{ '%.2f'|format(final_avg_score) }}{% else %}N/A{% endif %}</span><span class="score-outof">/ 7</span></div>
+          <div class="score-track" role="img" aria-label="Signal score on a scale from 1 to 7"><div class="score-fill"></div></div>
+          <p class="score-caption">Average of available segment estimates · 1 to 7 scale</p>
+        </div>
+        <div class="readout">
+          <h2>At a glance</h2>
+          <p>This score summarizes experimental facial-action and head-pose estimates from selected video frames. It does not evaluate spoken answers, skills, or role requirements.</p>
+          <span class="review-tag">{{ final_label }}</span>
+        </div>
+      </section>
+      <section class="learning-brief" aria-labelledby="learningTitle">
+        <div class="learning-head"><h2 id="learningTitle">What to learn from this session</h2><span>Candidate practice guide · generated from available session data</span></div>
+        <p class="signal-note">{{ signal_note }}</p>
+        <div class="learning-grid">
+          <div class="learning-column">
+            <h3>Read this result carefully</h3>
+            <ul>{% for takeaway in candidate_takeaways %}<li>{{ takeaway }}</li>{% endfor %}</ul>
+          </div>
+          <div class="learning-column">
+            <h3>Practice before the next interview</h3>
+            <ol>{% for step in practice_steps %}<li>{{ step }}</li>{% endfor %}</ol>
+          </div>
+        </div>
+      </section>
+      <div class="content-grid">
+        <section>
+          <div class="section-heading"><h2 class="section-title">Modeled video cues</h2><span class="section-note">Continuous weighted values on this model's 1–3 scale</span></div>
+          <table class="trait-table">
+            <thead><tr><th>Modeled cue</th><th>Relative scale</th><th>Avg.</th></tr></thead>
+            <tbody>
+              {% for trait in trait_rows %}
+              <tr><td class="trait-name">{{ trait.name }}</td><td><div class="trait-meter" aria-label="{{ trait.name }} modeled cue score {{ trait.score }} out of 3"><span style="width: {{ trait.width }}%"></span></div></td><td class="trait-value">{{ trait.score }}</td></tr>
+              {% else %}
+              <tr><td colspan="3">No modeled cue results available for this session.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div class="scale-caption"><span>1 · lower model value</span><span>2</span><span>3 · higher model value</span></div>
+          <table class="segment-table">
+            <thead><tr><th>Segment</th><th>Signal score</th><th>Recorded note</th></tr></thead>
+            <tbody>
+              {% for segment in segment_rows %}
+              <tr><td>{{ segment.segment }}</td><td>{{ '%.2f'|format(segment.score) }} / 7</td><td>Supplementary estimate</td></tr>
+              {% else %}
+              <tr><td colspan="3">No segment scores available.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </section>
+      </div>
+      <section class="frame-section">
+        <div class="section-heading"><h2 class="section-title">Sampled frame</h2><span class="section-note">One selected frame with model overlay</span></div>
+        <div class="frame-layout">
+          <div>{% if annotated_image %}<img class="annotated" src="{{ url_for('static', filename='results/' + annotated_image) }}" alt="Selected video frame with analysis overlay">{% else %}<div class="no-frame">No annotated frame available.</div>{% endif %}</div>
+          <div class="limitation"><strong>Consistent recruiter follow-up</strong><br>{{ followup_note }}<br><br><strong>Limits</strong><br>{{ limits_note }} Facial expressions and head movement vary by individual, culture, disability, context, and recording conditions.</div>
+        </div>
+      </section>
+    </main>
+    <footer>Interview Review · Experimental non-verbal signal estimates · Human review required</footer>
+  </div>
+</body>
+</html>

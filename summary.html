@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Interview Feed</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f4f6f8; text-align: center; padding-top: 40px; }
+    .video-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 700px;
+      height: 520px;
+      background-color: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      margin: 0 auto 20px;
+      position: relative;
+    }
+    #video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #placeholder {
+      position: absolute;
+      color: #fff;
+      font-size: 1.2rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+  <div class="container mt-5">
+    <div class="card shadow p-4">
+      <h2 class="text-center mb-4">📊 Interview Summary</h2>
+
+      <h4>Final Average Score: <span class="text-primary">{{ final_avg_score }}</span></h4>
+
+      <!-- Likert Scale Bar (1-7) -->
+      <div class="likert-container mt-3">
+        <div class="d-flex justify-content-between mb-1" style="font-size:0.9rem;">
+          <small>1</small><small>2</small><small>3</small><small>4</small><small>5</small><small>6</small><small>7</small>
+        </div>
+
+        <div class="likert-bar" id="likertBarWrap" aria-hidden="true">
+          <div class="likert-fill" id="likertFill"></div>
+          <div class="likert-marker" id="likertMarker" title="Score marker"></div>
+        </div>
+
+        <p class="text-muted mt-2" style="font-size:0.9rem;">Scale: 1 = Not Confident → 7 = Very Confident</p>
+      </div>
+
+      <style>
+        .likert-container { width:100%; max-width:600px; margin:0 auto; }
+        .likert-bar {
+          position: relative;
+          height: 20px;
+          background: #e9ecef;
+          border-radius: 10px;
+          overflow: hidden;
+        }
+        .likert-fill {
+          position: absolute;
+          left: 0; top: 0;
+          height: 100%; width: 0%;
+          border-radius: 10px;
+          transition: width 600ms ease, background-color 400ms ease;
+        }
+        .likert-marker {
+          position: absolute;
+          top: 50%;
+          width: 12px;
+          height: 24px;
+          transform: translate(-50%, -50%);
+          border-radius: 4px;
+          background: #333;
+          transition: left 600ms ease, background-color 400ms ease;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+        }
+      </style>
+
+      <hr>
+
+      <h5>Trait Averages:</h5>
+      <ul class="list-group">
+        {% for trait, val in averages.items() %}
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center">
+            {{ trait.replace('_', ' ').title() }}
+            <span class="badge bg-info rounded-pill">{{ val }}</span>
+          </div>
+
+          {% if trait.lower() != 'hire_likert' %}
+          <!-- Mini Likert bar (1–3) -->
+          <div class="trait-likert mt-2">
+            <div class="trait-likert-bar">
+              <div class="trait-likert-fill" style="width: 0%;"></div>
+            </div>
+            <div class="d-flex justify-content-between mt-1" style="font-size:0.8rem;">
+              <small>1</small><small>2</small><small>3</small>
+            </div>
+          </div>
+          {% endif %}
+
+          <input type="hidden" class="trait-score" value="{{ val }}">
+        </li>
+        {% endfor %}
+      </ul>
+
+      {% if annotated_image %}
+      <div class="text-center mt-4">
+        <h5>🖼️ Final Annotated Frame</h5>
+        <img src="{{ url_for('static', filename='results/' + annotated_image) }}"
+             class="img-fluid rounded shadow mt-3"
+             style="max-width:600px;">
+      </div>
+      {% else %}
+      <p class="text-muted mt-4">No annotated frame available.</p>
+      {% endif %}
+
+      <style>
+        .trait-likert-bar {
+          position: relative;
+          height: 10px;
+          background: #e9ecef;
+          border-radius: 5px;
+          overflow: hidden;
+        }
+        .trait-likert-fill {
+          position: absolute;
+          left: 0; top: 0;
+          height: 100%; width: 0%;
+          border-radius: 5px;
+          transition: width 600ms ease, background-color 400ms ease;
+        }
+      </style>
+
+      <hr>
+      <h5>🗣️ AI Feedback Summary</h5>
+      <p class="text-muted mt-3">{{ feedback }}</p>
+
+      <div class="text-center mt-4">
+        <a href="/reset_session" class="btn btn-primary">🔁 Restart Analysis</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // === Main 1–7 Likert bar ===
+    let raw = "{{ final_avg_score | default('') }}";
+    let score = parseFloat(raw);
+    if (!isFinite(score)) score = null;
+    else score = Math.max(1, Math.min(7, score));
+
+    const fill = document.getElementById('likertFill');
+    const marker = document.getElementById('likertMarker');
+    const wrap = document.getElementById('likertBarWrap');
+
+    if (fill && marker && wrap) {
+      if (score === null) {
+        fill.style.width = '0%';
+        fill.style.backgroundColor = '#e0e0e0';
+        marker.style.left = '-10px';
+        marker.style.backgroundColor = '#777';
+      } else {
+        const percentage = ((score - 1) / 6) * 100;
+        const pctStr = percentage.toFixed(2) + '%';
+
+        let color = '#e74c3c';
+        if (score >= 6) color = '#27ae60';
+        else if (score >= 4) color = '#f1c40f';
+
+        fill.style.width = pctStr;
+        fill.style.backgroundColor = color;
+        marker.style.left = `calc(${percentage}%)`;
+        marker.style.backgroundColor = color;
+        marker.setAttribute('title', `Score ${score} / 7`);
+      }
+    }
+
+    // === Mini 1–3 Likert bars for traits ===
+    const traitScores = document.querySelectorAll('.trait-score');
+    traitScores.forEach((input) => {
+      const li = input.closest('li');
+      const traitName = li.querySelector('div:first-child').innerText.trim().toLowerCase();
+
+      if (traitName === 'hire likert') return; // skip hire_likert
+
+      let val = parseFloat(input.value);
+      if (!isFinite(val)) val = 0;
+      val = Math.max(1, Math.min(3, val));
+
+      const bar = li.querySelector('.trait-likert-fill');
+      if (!bar) return;
+
+      const percentage = ((val - 1) / 2) * 100;
+      let color = '#e74c3c';
+      if (val >= 3) color = '#27ae60';
+      else if (val >= 2) color = '#f1c40f';
+
+      bar.style.width = percentage + '%';
+      bar.style.backgroundColor = color;
+    });
+  });
+  </script>
+</body>
+</html>
